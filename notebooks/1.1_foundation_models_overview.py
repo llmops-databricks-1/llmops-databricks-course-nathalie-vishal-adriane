@@ -71,10 +71,7 @@ for endpoint in endpoints:
 host = w.config.host
 token = w.tokens.create(lifetime_seconds=1200).token_value
 
-client = OpenAI(
-    api_key=token,
-    base_url=f"{host.rstrip('/')}/serving-endpoints"
-)
+client = OpenAI(api_key=token, base_url=f"{host.rstrip('/')}/serving-endpoints")
 model_name = "databricks-llama-4-maverick"
 
 # Call the model
@@ -82,11 +79,11 @@ response = client.chat.completions.create(
     model=model_name,
     messages=[
         {"role": "system", "content": "You are a helpful AI assistant."},
-        {"role": "user", "content": "Explain LLMOps in 3 sentences."}
+        {"role": "user", "content": "Explain LLMOps in 3 sentences."},
     ],
     max_tokens=200,
-     # Temperature ontrols randomness: 0.0 = deterministic, 1.0 = more creative/random
-    temperature=0.7
+    # Temperature ontrols randomness: 0.0 = deterministic, 1.0 = more creative/random
+    temperature=0.7,
 )
 
 logger.info("Response:")
@@ -125,22 +122,31 @@ logger.info(f"Output tokens: {response.usage.completion_tokens}")
 # MAGIC | Llama 3.2 3B | 46.429 | 92.857 |
 # MAGIC | Llama 3.2 1B | 42.857 | 85.714 |
 # MAGIC
-# MAGIC **Note**: DBU pricing varies by region and contract. Check [Databricks Pricing](https://www.databricks.com/product/pricing) for current rates.
+# MAGIC **Note**: DBU pricing varies by region and contract.
+# MAGIC Check [Databricks Pricing](https://www.databricks.com/product/pricing)
+# MAGIC for current rates.
 # MAGIC
 # MAGIC ### Cost Calculation Example
 
 # COMMAND ----------
 
-def calculate_api_cost(input_tokens: int, output_tokens: int,
-                       input_dbu_per_1m: float, output_dbu_per_1m: float) -> float:
+
+def calculate_api_cost(
+    input_tokens: int,
+    output_tokens: int,
+    input_dbu_per_1m: float,
+    output_dbu_per_1m: float,
+) -> float:
     """Calculate DBU cost for pay-per-token API."""
     input_cost = (input_tokens / 1_000_000) * input_dbu_per_1m
     output_cost = (output_tokens / 1_000_000) * output_dbu_per_1m
     return input_cost + output_cost
 
+
 def calculate_provisioned_cost(hours: int, dbu_per_hour: float) -> float:
     """Calculate DBU cost for provisioned throughput."""
     return hours * dbu_per_hour
+
 
 # Example: 1M input tokens, 500K output tokens with Llama 3.3 70B
 api_cost = calculate_api_cost(1_000_000, 500_000, 7.143, 21.429)
@@ -167,7 +173,8 @@ logger.info("Provisioned throughput becomes cost-effective at high, predictable 
 # MAGIC %md
 # MAGIC ## 4. External Models
 # MAGIC
-# MAGIC Databricks allows you to integrate external model providers through a unified interface.
+# MAGIC Databricks allows you to integrate external model providers
+# MAGIC through a unified interface.
 
 # COMMAND ----------
 
@@ -176,11 +183,13 @@ logger.info("Provisioned throughput becomes cost-effective at high, predictable 
 # MAGIC
 # MAGIC | Aspect | Foundation APIs | Provisioned Throughput | External Models |
 # MAGIC |--------|----------------|------------------------|-----------------|
-# MAGIC | **Pricing** | Pay-per-token | Pay-per-model-unit-hour | Pay-per-token (external) |
+# MAGIC | **Pricing** | Pay-per-token | Pay-per-model-unit-hour |
+# MAGIC Pay-per-token (external) |
 # MAGIC | **Performance** | Shared capacity | Dedicated capacity | Varies by provider |
 # MAGIC | **Latency** | Variable | Predictable | Variable |
 # MAGIC | **Fine-tuning** | No | Yes | Limited |
-# MAGIC | **Best For** | Variable workloads | High-volume, predictable | Specific model requirements |
+# MAGIC | **Best For** | Variable workloads | High-volume, predictable |
+# MAGIC Specific model requirements |
 # MAGIC | **Setup** | Instant | Requires provisioning | Requires credentials |
 
 # COMMAND ----------

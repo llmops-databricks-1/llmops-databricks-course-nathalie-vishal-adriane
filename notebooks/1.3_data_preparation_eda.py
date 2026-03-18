@@ -6,6 +6,7 @@ Loads olist_ecomerce_data from workspace.default and performs exploratory data a
 
 # COMMAND ----------
 
+import matplotlib.pyplot as plt
 import pandas as pd
 
 # COMMAND ----------
@@ -13,7 +14,7 @@ import pandas as pd
 # Load data from Databricks table
 TABLE_NAME = "workspace.default.olist_ecomerce_data"
 
-df_spark = spark.table(TABLE_NAME)
+df_spark = spark.table(TABLE_NAME)  # noqa: F821 - spark is a Databricks runtime global
 print(f"Table   : {TABLE_NAME}")
 print(f"Row count: {df_spark.count():,}")
 print(f"Columns : {len(df_spark.columns)}")
@@ -50,30 +51,27 @@ print(missing_summary if not missing_summary.empty else "None")
 # COMMAND ----------
 
 # --- Descriptive statistics (numeric) ---
-df.describe(include="number").T
+_ = df.describe(include="number").T  # Display in notebook
 
 # COMMAND ----------
 
 # --- Descriptive statistics (object / categorical) ---
-df.describe(include="object").T
+_ = df.describe(include="object").T  # Display in notebook
 
 # COMMAND ----------
 
 # --- Cardinality of categorical columns ---
 cat_cols = df.select_dtypes(include="object").columns.tolist()
 cardinality = {col: df[col].nunique() for col in cat_cols}
-cardinality_df = (
-    pd.DataFrame.from_dict(cardinality, orient="index", columns=["unique_values"])
-    .sort_values("unique_values", ascending=False)
-)
+cardinality_df = pd.DataFrame.from_dict(
+    cardinality, orient="index", columns=["unique_values"]
+).sort_values("unique_values", ascending=False)
 print("Cardinality of categorical columns:")
-cardinality_df
+_ = cardinality_df  # Display in notebook
 
 # COMMAND ----------
 
 # --- Distribution of key numeric columns ---
-import matplotlib.pyplot as plt
-
 numeric_cols = df.select_dtypes(include="number").columns.tolist()[:8]  # cap at 8
 if numeric_cols:
     fig, axes = plt.subplots(
@@ -103,9 +101,6 @@ for col in top_cat_cols:
 # COMMAND ----------
 
 # --- Correlation heatmap (numeric columns) ---
-import matplotlib.pyplot as plt
-import numpy as np
-
 if len(numeric_cols) > 1:
     corr = df[numeric_cols].corr()
     fig, ax = plt.subplots(figsize=(10, 8))
