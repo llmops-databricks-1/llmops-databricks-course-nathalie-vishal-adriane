@@ -1,6 +1,6 @@
-# Order Behavior RCA Agent (anonymized, open‑data edition)
+# Order Behavior RCA Agent
 
-An LLMOps project built on Databricks that detects anomalies in order mix/volume and runs a structured root-cause analysis (RCA) with a clear narrative and "next question" guidance.
+The Root Cause Analysis for e-comerce Our project aims to deliver an automated Root Cause Analysis (RCA) engine built on Databricks Genie to detect and explain anomalies in order mix and volume within the Olist e-commerce dataset. By integrating a reasoning agent framework, the system decomposes performance shifts into structured drivers such as lost customers, category mix shifts, or concentration spikes.
 
 ---
 
