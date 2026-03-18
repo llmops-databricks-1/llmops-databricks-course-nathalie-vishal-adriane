@@ -2,6 +2,9 @@
 LLMOps Course on Databricks
 </h1>
 
+## Project Proposal
+The Root Cause Analysis for e-comerce Our project aims to deliver an automated Root Cause Analysis (RCA) engine built on Databricks Genie to detect and explain anomalies in order mix and volume within the Olist e-commerce dataset. By integrating a reasoning agent framework, the system decomposes performance shifts into structured drivers such as lost customers, category mix shifts, or concentration spikes. 
+
 ## Practical information
 - Weekly lectures on Wednesdays 16:00-18:00 CET.
 - Weekly Q&A on Mondays 16:00-17:00 CET.
