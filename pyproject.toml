@@ -1,7 +1,7 @@
 [project]
-name = "llmops-databricks-course-nathalie995"
+name = "llmops-databricks-course-nathalie-vishal-adriane"
 dynamic = ["version"]
-description = "llmops-databricks-course-nathalie995 - LLMOps Course on Databricks"
+description = "llmops-databricks-course-nathalie-vishal-adriane - LLMOps Course on Databricks"
 requires-python = ">=3.12, <3.13"
 dependencies = [
     "cffi==1.17.1",

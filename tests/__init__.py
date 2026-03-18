@@ -1,1 +1,1 @@
-"""Tests for llmops-databricks-course-nathalie995."""
+"""Tests for llmops-databricks-course-nathalie-vishal-adriane."""

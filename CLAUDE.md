@@ -20,7 +20,7 @@ uv run pytest
 ## Project Structure
 
 ```
-llmops-databricks-course-nathalie995/
+llmops-databricks-course-nathalie-vishal-adriane/
 ├── .claude/
 │   └── commands/           # Claude Code slash commands (fix-deps, run-notebook, ship)
 ├── .github/
