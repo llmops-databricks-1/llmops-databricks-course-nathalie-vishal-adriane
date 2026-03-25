@@ -3,7 +3,7 @@ resources:
     hello_world_job:
       name: hello-world
       tags:
-        project_name: "llmops-databricks-course-nathalie995"
+        project_name: "llmops-databricks-course-nathalie-vishal-adriane"
 
       environments:
         - environment_key: default
