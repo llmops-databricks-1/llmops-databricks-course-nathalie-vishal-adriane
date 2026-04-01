@@ -86,5 +86,9 @@ ignore = [
     "ANN101"
 ]
 
+[tool.ruff.lint.per-file-ignores]
+# Databricks notebooks: long markdown/pip lines; imports after # COMMAND ----------
+"notebooks/**/*.py" = ["E501", "E402"]
+
 [tool.ruff.format]
 indent-style = "space"
