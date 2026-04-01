@@ -1,0 +1,26 @@
+resources:
+  jobs:
+    data_pipeline:
+      name: ordr-bhvr-rca-data-pipeline
+      schedule:
+        quartz_cron_expression: "0 0 6 * * ?"
+        timezone_id: "Europe/Amsterdam"
+        pause_status: ${var.schedule_pause_status}
+      tags:
+        project_name: "ordr_bhvr_rca_agent"
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"
+            dependencies:
+              - ../dist/*.whl
+
+      tasks:
+        - task_key: preprocessing
+          environment_key: default
+          notebook_task:
+            notebook_path: deployment_scripts/process_ordr_bhvr_rca_data.py
+            base_parameters:
+              env: ${bundle.target}
+              git_sha: "${var.git_sha}"
+              run_id: "{{job.run_id}}"
