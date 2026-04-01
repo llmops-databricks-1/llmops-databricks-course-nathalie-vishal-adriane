@@ -48,7 +48,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["your_custom_package*"]
+include = ["your_custom_package*", "ordr_bhvr_rca_agent*"]
 
 [tool.setuptools.dynamic]
 version = { file = "version.txt" }
@@ -85,6 +85,10 @@ ignore = [
     "ANN102",
     "ANN101"
 ]
+
+[tool.ruff.lint.per-file-ignores]
+# Databricks notebooks: long markdown/pip lines; imports after # COMMAND ----------
+"notebooks/**/*.py" = ["E501", "E402"]
 
 [tool.ruff.format]
 indent-style = "space"

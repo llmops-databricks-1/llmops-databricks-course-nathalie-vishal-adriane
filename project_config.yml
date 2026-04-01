@@ -2,39 +2,42 @@
 
 # Development environment
 dev:
-  catalog: workspace
-  schema: default
+  catalog: mlops_dev
+  schema: vishalkr
   table_name: olist_ecomerce_data
-  volume: arxiv_files
+  volume: ordr_bhvr_rca_agent
   llm_endpoint: databricks-llama-4-maverick
   embedding_endpoint: databricks-gte-large-en
   warehouse_id: 7077f4cb0e616c62
   vector_search_endpoint: llmops_course_vs_endpoint
   genie_space_id: 01f113061bf41578baff744a41bd9ab0
+  usage_policy_id: f8d51332-c7c5-4c63-abc1-989c11092083
 
 # Acceptance/Staging environment
 acc:
-  catalog: workspace
-  schema: default
+  catalog: mlops_acc
+  schema: vishalkr
   table_name: olist_ecomerce_data
-  volume: arxiv_files
+  volume: ordr_bhvr_rca_agent
   llm_endpoint: databricks-meta-llama-3-1-70b-instruct
   embedding_endpoint: databricks-gte-large-en
   warehouse_id: 7077f4cb0e616c62
   vector_search_endpoint: llmops_course_vs_endpoint
   genie_space_id: 01f113061bf41578baff744a41bd9ab0
+  usage_policy_id: f8d51332-c7c5-4c63-abc1-989c11092083
 
 # Production environment
 prd:
-  catalog: workspace
-  schema: default
+  catalog: mlops_prd
+  schema: vishalkr
   table_name: olist_ecomerce_data
-  volume: arxiv_files
+  volume: ordr_bhvr_rca_agent
   llm_endpoint: databricks-meta-llama-3-1-70b-instruct
   embedding_endpoint: databricks-gte-large-en
   warehouse_id: 7077f4cb0e616c62
   vector_search_endpoint: llmops_course_vs_endpoint
   genie_space_id: 01f113061bf41578baff744a41bd9ab0
+  usage_policy_id: f8d51332-c7c5-4c63-abc1-989c11092083
 
 # Model configuration
 model_config:
