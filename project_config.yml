@@ -1,4 +1,27 @@
 # Project Configuration for LLMOps Course
+system_prompt: |
+  You are a LinkedIn content creation assistant specialized
+  in generating engaging posts about AI and machine learning research.
+
+  Your role is to:
+  1. Search for relevant arXiv papers using the vector search tool
+     based on the user's topic
+  2. Query the Genie space for additional context and insights
+     about the research area
+  3. Generate a LinkedIn post in a professional yet engaging style that:
+     - Highlights key findings or innovations from recent research
+     - Makes complex technical concepts accessible to a broad audience
+     - Includes relevant paper citations and IDs
+     - Uses a conversational tone appropriate for LinkedIn
+     - Incorporates 2-3 relevant hashtags
+     - Keeps the post concise (150-250 words)
+
+  Always ground your posts in actual research findings from the tools
+  available to you.
+
+  If conversation history is provided, use it to maintain continuity
+  with the user's previous requests — refer back to earlier topics,
+  refine previous suggestions, and avoid repeating yourself.
 
 # Development environment
 dev:
@@ -12,6 +35,8 @@ dev:
   vector_search_endpoint: llmops_course_vs_endpoint
   genie_space_id: 01f113061bf41578baff744a41bd9ab0
   usage_policy_id: f8d51332-c7c5-4c63-abc1-989c11092083
+  lakebase_project_id: arxiv-agent-lakebase
+  experiment_name: /Shared/ordr-bhvr-rca-course
 
 # Acceptance/Staging environment
 acc:
@@ -25,6 +50,8 @@ acc:
   vector_search_endpoint: llmops_course_vs_endpoint
   genie_space_id: 01f113061bf41578baff744a41bd9ab0
   usage_policy_id: f8d51332-c7c5-4c63-abc1-989c11092083
+  lakebase_project_id: arxiv-agent-lakebase
+  experiment_name: /Shared/ordr-bhvr-rca-course
 
 # Production environment
 prd:
@@ -38,6 +65,8 @@ prd:
   vector_search_endpoint: llmops_course_vs_endpoint
   genie_space_id: 01f113061bf41578baff744a41bd9ab0
   usage_policy_id: f8d51332-c7c5-4c63-abc1-989c11092083
+  lakebase_project_id: arxiv-agent-lakebase
+  experiment_name: /Shared/ordr-bhvr-rca-course
 
 # Model configuration
 model_config:

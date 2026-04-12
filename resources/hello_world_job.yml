@@ -10,7 +10,8 @@ resources:
           spec:
             environment_version: "4"
             dependencies:
-              - ../dist/*.whl
+              # Pin project wheel; avoid ../dist/*.whl (stale extra .whl files break imports).
+              - ../dist/llmops_databricks_course_nathalie_vishal_adriane-*.whl
 
       tasks:
         - task_key: hello_world
