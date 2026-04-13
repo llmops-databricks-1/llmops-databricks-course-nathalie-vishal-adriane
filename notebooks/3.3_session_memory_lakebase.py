@@ -43,12 +43,13 @@ project_id = cfg.lakebase_project_id
 try:
     project = pg_api.get_project(name=f"projects/{project_id}")
 except Exception:
+    # Note: budget_policy_id is not supported in ProjectSpec for Lakebase projects
+    # Budget policies can be configured at the account level
     project = pg_api.create_project(
         project_id=project_id,
         project=Project(
             spec=ProjectSpec(
                 display_name=project_id,
-                budget_policy_id=cfg.usage_policy_id,
                 default_endpoint_settings=ProjectDefaultEndpointSettings(
                     autoscaling_limit_min_cu=1,
                     autoscaling_limit_max_cu=4,
@@ -135,8 +136,12 @@ with psycopg.connect(conn_string) as conn:
 
 from ordr_bhvr_rca_agent.memory import LakebaseMemory
 
+# LakebaseMemory needs host and instance_name for connection
+# The instance_name should be the endpoint name for credential generation
 memory = LakebaseMemory(
-    project_id=project_id,
+    host=host,
+    instance_name=endpoint.name,
+    pg_api=pg_api,
 )
 
 # COMMAND ----------

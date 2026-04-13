@@ -4,10 +4,10 @@ import json
 import os
 import urllib.parse
 from typing import Any
-from uuid import uuid4
 
 import psycopg
 from databricks.sdk import WorkspaceClient
+from databricks.sdk.service.postgres import PostgresAPI
 from loguru import logger
 from psycopg_pool import ConnectionPool
 
@@ -19,9 +19,11 @@ class LakebaseMemory:
         self,
         host: str,
         instance_name: str,
+        pg_api: PostgresAPI | None = None,
     ):
         self.host = host
         self.instance_name = instance_name
+        self.pg_api = pg_api
         self._pool: ConnectionPool | None = None
         self.client_id = os.getenv("DATABRICKS_CLIENT_ID", None)
 
@@ -35,6 +37,9 @@ class LakebaseMemory:
         """
         w = WorkspaceClient()
 
+        # Use provided pg_api or create a new one
+        pg_api = self.pg_api if self.pg_api is not None else PostgresAPI(w.api_client)
+
         if self.client_id:
             # SPN authentication
             username = self.client_id
@@ -44,9 +49,8 @@ class LakebaseMemory:
             username = urllib.parse.quote_plus(user.user_name)
 
         # Exchange auth for a short-lived Lakebase database token
-        pg_credential = w.database.generate_database_credential(
-            request_id=str(uuid4()), instance_names=[self.instance_name]
-        )
+        # instance_name should be the full endpoint path
+        pg_credential = pg_api.generate_database_credential(endpoint=self.instance_name)
 
         return (
             f"postgresql://{username}:{pg_credential.token}@{self.host}:5432/"

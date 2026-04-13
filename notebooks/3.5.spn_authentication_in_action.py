@@ -28,8 +28,8 @@ pg_api = PostgresAPI(w.api_client)
 project_id = cfg.lakebase_project_id
 
 scope_name = "rca-agent-scope"
-os.environ["LAKEBASE_SP_CLIENT_ID"] = dbutils.secrets.get(scope_name, "client_id")
-os.environ["LAKEBASE_SP_CLIENT_SECRET"] = dbutils.secrets.get(scope_name, "client_secret")
+os.environ["LAKEBASE_SP_CLIENT_ID"] = dbutils.secrets.get(scope_name, "client_id")  # noqa: F821
+os.environ["LAKEBASE_SP_CLIENT_SECRET"] = dbutils.secrets.get(scope_name, "client_secret")  # noqa: F821
 
 
 w = WorkspaceClient()
@@ -43,7 +43,8 @@ lakebase_host = instance.read_write_dns
 project = pg_api.get_project(name=f"projects/{project_id}")
 
 memory = LakebaseMemory(
-    project_id=project_id,
+    host=lakebase_host,
+    instance_name=instance_name,
 )
 
 # COMMAND ----------
