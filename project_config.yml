@@ -6,12 +6,13 @@ dev:
   schema: vishalkr
   table_name: olist_ecomerce_data
   volume: ordr_bhvr_rca_agent
-  llm_endpoint: databricks-llama-4-maverick
+  llm_endpoint: databricks-claude-sonnet-4-5
   embedding_endpoint: databricks-gte-large-en
   warehouse_id: 7077f4cb0e616c62
   vector_search_endpoint: llmops_course_vs_endpoint
-  genie_space_id: 01f113061bf41578baff744a41bd9ab0
+  genie_space_id: 01f122d81aa51743bbd0357323432b75
   usage_policy_id: f8d51332-c7c5-4c63-abc1-989c11092083
+  lakebase_project_id: rca-agent-lakebase
 
 # Acceptance/Staging environment
 acc:
@@ -25,6 +26,7 @@ acc:
   vector_search_endpoint: llmops_course_vs_endpoint
   genie_space_id: 01f113061bf41578baff744a41bd9ab0
   usage_policy_id: f8d51332-c7c5-4c63-abc1-989c11092083
+  lakebase_project_id: rca-agent-lakebase
 
 # Production environment
 prd:
@@ -38,6 +40,7 @@ prd:
   vector_search_endpoint: llmops_course_vs_endpoint
   genie_space_id: 01f113061bf41578baff744a41bd9ab0
   usage_policy_id: f8d51332-c7c5-4c63-abc1-989c11092083
+  lakebase_project_id: rca-agent-lakebase
 
 # Model configuration
 model_config:

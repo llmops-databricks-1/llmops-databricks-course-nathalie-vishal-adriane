@@ -1,5 +1,15 @@
 # Databricks notebook source
 
+# COMMAND ----------
+
+# MAGIC %pip install /Workspace/Users/aschelin@gmail.com/.bundle/llmops-databricks-course-nathalie-vishal-adriane/dev/files
+
+# COMMAND ----------
+
+# MAGIC %restart_python
+
+# COMMAND ----------
+
 # Project
 #  └── Branches (main, development, staging, etc.)
 #        ├── Computes (R/W compute)
@@ -85,15 +95,17 @@ with psycopg.connect(conn_string) as conn:
 test_session_id = f"test-session-{uuid4()}"
 test_messages = [
     {"role": "user", "content": "Hello, what can you help me with?"},
-    {"role": "assistant", "content": "I can help you find research papers."},
-    {"role": "user", "content": "Find papers about LLM reasoning"},
+    {
+        "role": "assistant",
+        "content": "I can help you analyze sales data and identify issues.",
+    },
+    {"role": "user", "content": "What caused the sales decline in May 2018?"},
 ]
 
 with psycopg.connect(conn_string) as conn:
     for msg in test_messages:
         conn.execute(
-            "INSERT INTO session_messages (session_id, message_data) "
-            "VALUES (%s, %s)",
+            "INSERT INTO session_messages (session_id, message_data) VALUES (%s, %s)",
             (test_session_id, json.dumps(msg)),
         )
 
@@ -121,7 +133,7 @@ with psycopg.connect(conn_string) as conn:
 
 # COMMAND ----------
 
-from arxiv_curator.memory import LakebaseMemory
+from ordr_bhvr_rca_agent.memory import LakebaseMemory
 
 memory = LakebaseMemory(
     project_id=project_id,
@@ -132,8 +144,8 @@ memory = LakebaseMemory(
 # Test save
 session_id = f"memory-test-{uuid4()}"
 messages = [
-    {"role": "user", "content": "What papers discuss transformer architectures?"},
-    {"role": "assistant", "content": "Here are some relevant papers..."},
+    {"role": "user", "content": "What are the main factors affecting sales performance?"},
+    {"role": "assistant", "content": "Here are the key findings from the analysis..."},
 ]
 
 memory.save_messages(session_id, messages)

@@ -22,6 +22,9 @@ class ProjectConfig(BaseModel):
     genie_space_id: str | None = Field(
         None, description="Genie space ID for MCP integration"
     )
+    lakebase_project_id: str | None = Field(
+        None, description="Lakebase (PostgreSQL) project ID"
+    )
     system_prompt: str = Field(
         default=(
             "You are a helpful AI assistant that helps users find and "

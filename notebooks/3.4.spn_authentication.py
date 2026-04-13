@@ -1,9 +1,21 @@
 # Databricks notebook source
+
+# COMMAND ----------
+
+# MAGIC %pip install /Workspace/Users/aschelin@gmail.com/.bundle/llmops-databricks-course-nathalie-vishal-adriane/dev/files
+
+# COMMAND ----------
+
+# MAGIC %restart_python
+
+# COMMAND ----------
+
 from databricks.sdk import WorkspaceClient
 from requests.auth import HTTPBasicAuth
 
 w = WorkspaceClient()
 
+# TODO: Replace these with your actual credentials
 client_id = "your client id"
 client_secret = "your client secret"
 account_id = "your account id"
@@ -15,10 +27,10 @@ w.secrets.put_secret(scope="admin", key="account_id", string_value=account_id)
 
 
 # COMMAND ----------
+import urllib
+
 import requests
 from databricks.sdk import WorkspaceClient
-from requests.auth import HTTPBasicAuth
-import urllib
 
 w = WorkspaceClient()
 
@@ -33,11 +45,11 @@ account_host = "https://accounts.cloud.databricks.com"
 token = requests.post(
     f"{account_host}/oidc/accounts/{account_id}/v1/token",
     auth=HTTPBasicAuth(admin_client_id, admin_client_secret),
-    data={"grant_type": "client_credentials", "scope": "all-apis"}
+    data={"grant_type": "client_credentials", "scope": "all-apis"},
 ).json()["access_token"]
 
 # Step 1: Create service principal + OAuth secret
-sp = w.service_principals.create(display_name="lakebase-sp-arxiv")
+sp = w.service_principals.create(display_name="lakebase-sp-rca")
 secret_resp = requests.post(
     f"{account_host}/api/2.0/accounts/{account_id}/servicePrincipals/{sp.id}/credentials/secrets",
     headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
@@ -48,7 +60,7 @@ client_secret = secret_resp.json()["secret"]
 
 # COMMAND ----------
 # Step 2: Store credentials in a secret scope
-scope_name = "arxiv-agent-scope"
+scope_name = "rca-agent-scope"
 try:
     w.secrets.create_scope(scope=scope_name)
 except Exception:
@@ -58,12 +70,19 @@ w.secrets.put_secret(scope=scope_name, key="client_secret", string_value=client_
 
 # COMMAND ----------
 # Step 3: Add SPN role to project
-from databricks.sdk.service.postgres import (
-    PostgresAPI, Role, RoleAuthMethod, RoleIdentityType, RoleRoleSpec,
-)
 import psycopg
+from databricks.sdk.service.postgres import (
+    PostgresAPI,
+    Role,
+    RoleAuthMethod,
+    RoleIdentityType,
+    RoleRoleSpec,
+)
 
-project_id = "arxiv-agent-lakebase"
+from ordr_bhvr_rca_agent.config import ProjectConfig
+
+cfg = ProjectConfig.from_yaml("../project_config.yml")
+project_id = cfg.lakebase_project_id
 w = WorkspaceClient()
 pg_api = PostgresAPI(w.api_client)
 
@@ -80,11 +99,11 @@ pg_api.create_role(
             postgres_role=client_id,
         )
     ),
-    role_id="arxiv-agent-spn",
+    role_id="rca-agent-spn",
 ).wait()
 
 # COMMAND ----------
-# Step 4: Postgres role SQL 
+# Step 4: Postgres role SQL
 endpoint = next(iter(pg_api.list_endpoints(parent=branch_parent)))
 host = endpoint.status.hosts.host
 pg_credential = pg_api.generate_database_credential(endpoint=endpoint.name)

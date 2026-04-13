@@ -9,8 +9,17 @@
 
 # COMMAND ----------
 
-from ordr_bhvr_rca_agent.config import load_config, get_env
+# MAGIC %pip install /Workspace/Users/aschelin@gmail.com/.bundle/llmops-databricks-course-nathalie-vishal-adriane/dev/files
+
+# COMMAND ----------
+
+# MAGIC %restart_python
+
+# COMMAND ----------
+
 from pyspark.sql import SparkSession
+
+from ordr_bhvr_rca_agent.config import get_env, load_config
 
 spark = SparkSession.builder.getOrCreate()
 
