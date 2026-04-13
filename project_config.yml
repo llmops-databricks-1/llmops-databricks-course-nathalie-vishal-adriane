@@ -3,7 +3,7 @@
 # Development environment
 dev:
   catalog: mlops_dev
-  schema: vishalkr
+  schema: aschelin
   table_name: olist_ecomerce_data
   volume: ordr_bhvr_rca_agent
   llm_endpoint: databricks-claude-sonnet-4-5
@@ -17,7 +17,7 @@ dev:
 # Acceptance/Staging environment
 acc:
   catalog: mlops_acc
-  schema: vishalkr
+  schema: aschelin
   table_name: olist_ecomerce_data
   volume: ordr_bhvr_rca_agent
   llm_endpoint: databricks-meta-llama-3-1-70b-instruct
@@ -31,7 +31,7 @@ acc:
 # Production environment
 prd:
   catalog: mlops_prd
-  schema: vishalkr
+  schema: aschelin
   table_name: olist_ecomerce_data
   volume: ordr_bhvr_rca_agent
   llm_endpoint: databricks-meta-llama-3-1-70b-instruct
