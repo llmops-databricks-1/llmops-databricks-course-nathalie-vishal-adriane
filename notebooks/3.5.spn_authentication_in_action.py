@@ -28,23 +28,21 @@ pg_api = PostgresAPI(w.api_client)
 project_id = cfg.lakebase_project_id
 
 scope_name = "rca-agent-scope"
-os.environ["LAKEBASE_SP_CLIENT_ID"] = dbutils.secrets.get(scope_name, "client_id")  # noqa: F821
-os.environ["LAKEBASE_SP_CLIENT_SECRET"] = dbutils.secrets.get(scope_name, "client_secret")  # noqa: F821
-
-
-w = WorkspaceClient()
-os.environ["LAKEBASE_SP_HOST"] = w.config.host
+os.environ["DATABRICKS_CLIENT_ID"] = dbutils.secrets.get(scope_name, "client_id")  # noqa: F821
+os.environ["DATABRICKS_CLIENT_SECRET"] = dbutils.secrets.get(scope_name, "client_secret")  # noqa: F821
+os.environ["DATABRICKS_HOST"] = w.config.host
 
 # COMMAND ----------
-instance_name = "rca-agent-instance"
-instance = w.database.get_database_instance(instance_name)
-lakebase_host = instance.read_write_dns
-
+# Get project, branch, and endpoint details
 project = pg_api.get_project(name=f"projects/{project_id}")
+default_branch = next(iter(pg_api.list_branches(parent=project.name)))
+endpoint = next(iter(pg_api.list_endpoints(parent=default_branch.name)))
+host = endpoint.status.hosts.host
 
 memory = LakebaseMemory(
-    host=lakebase_host,
-    instance_name=instance_name,
+    host=host,
+    instance_name=endpoint.name,
+    pg_api=pg_api,
 )
 
 # COMMAND ----------

@@ -35,9 +35,9 @@ from databricks.sdk import WorkspaceClient
 w = WorkspaceClient()
 
 # Admin credentials from secret scope
-admin_client_id = dbutils.secrets.get("admin", "client_id")
-admin_client_secret = dbutils.secrets.get("admin", "client_secret")
-account_id = dbutils.secrets.get("admin", "account_id")
+admin_client_id = dbutils.secrets.get("admin", "client_id")  # noqa: F821
+admin_client_secret = dbutils.secrets.get("admin", "client_secret")  # noqa: F821
+account_id = dbutils.secrets.get("admin", "account_id")  # noqa: F821
 
 account_host = "https://accounts.cloud.databricks.com"
 
@@ -60,13 +60,16 @@ client_secret = secret_resp.json()["secret"]
 
 # COMMAND ----------
 # Step 2: Store credentials in a secret scope
+import contextlib
+
 scope_name = "rca-agent-scope"
-try:
+with contextlib.suppress(Exception):
     w.secrets.create_scope(scope=scope_name)
-except Exception:
-    pass  # scope already exists
 w.secrets.put_secret(scope=scope_name, key="client_id", string_value=client_id)
 w.secrets.put_secret(scope=scope_name, key="client_secret", string_value=client_secret)
+
+print(f"✓ Service principal created: {client_id}")
+print(f"✓ Credentials stored in secret scope: {scope_name}")
 
 # COMMAND ----------
 # Step 3: Add SPN role to project
