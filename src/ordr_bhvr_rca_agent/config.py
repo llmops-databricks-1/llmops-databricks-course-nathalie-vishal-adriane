@@ -13,8 +13,9 @@ class ProjectConfig(BaseModel):
 
     usage_policy_id: str = Field(..., description="Usage policy id")
     catalog: str = Field(..., description="Unity Catalog name")
-    db_schema: str = Field(..., description="Schema name", alias="schema")
+    schema: str = Field(..., description="Schema name")
     volume: str = Field(..., description="Volume name")
+    table_name: str = Field(..., description="Table name for data storage")
     llm_endpoint: str = Field(..., description="LLM endpoint name")
     embedding_endpoint: str = Field(..., description="Embedding endpoint name")
     warehouse_id: str = Field(..., description="Warehouse ID")
@@ -24,6 +25,9 @@ class ProjectConfig(BaseModel):
     )
     lakebase_project_id: str | None = Field(
         None, description="Lakebase (PostgreSQL) project ID"
+    )
+    experiment_name: str | None = Field(
+        None, description="MLflow experiment name for tracking"
     )
     system_prompt: str = Field(
         default=(
@@ -60,14 +64,9 @@ class ProjectConfig(BaseModel):
         return cls(**config_data[env])
 
     @property
-    def schema(self) -> str:
-        """Alias for db_schema for backward compatibility."""
-        return self.db_schema
-
-    @property
     def full_schema_name(self) -> str:
         """Get fully qualified schema name."""
-        return f"{self.catalog}.{self.db_schema}"
+        return f"{self.catalog}.{self.schema}"
 
     @property
     def full_volume_path(self) -> str:

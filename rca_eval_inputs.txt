@@ -1,0 +1,10 @@
+Compare sales behavior from March 2018 to May 2018
+What happened to order volumes in May 2018?
+Analyze the order volume decline in Q2 2018
+Which product categories had the largest sales drop in May 2018?
+What external factors might explain the order volume anomaly in spring 2018?
+Compare Electronics category performance between March and May 2018
+Why did Home & Garden orders decline in May 2018?
+Identify the root cause of the 17% order volume decrease in May 2018
+What was the mix vs. volume contribution to the May 2018 order decline?
+Explain the seasonal patterns in Brazilian e-commerce from March to May 2018

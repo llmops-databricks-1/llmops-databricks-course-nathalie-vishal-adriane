@@ -80,12 +80,12 @@ A rule‑based monitoring component that tracks daily order metrics and triggers
 An LLM‑based planning step that determines **which analyses and tools to run**, without accessing data directly.
 
 **Typical planning output:**
-- Identify affected metrics and dimensions  
-- Run attribution analysis  
-- Generate candidate hypotheses  
-- Validate hypotheses using tools  
-- Retrieve contextual evidence if needed  
-- Produce a final narrative summary  
+- Identify affected metrics and dimensions
+- Run attribution analysis
+- Generate candidate hypotheses
+- Validate hypotheses using tools
+- Retrieve contextual evidence if needed
+- Produce a final narrative summary
 
 ---
 
@@ -95,63 +95,63 @@ To ensure reproducibility and auditability, core analytical logic is implemented
 
 #### Key UC Functions
 
-**`order_metrics_by_dimension`**  
+**`order_metrics_by_dimension`**
 Aggregates order count, GMV, AOV, and unique customers across time windows and dimensions.
 
-**`compute_order_attribution`**  
+**`compute_order_attribution`**
 Performs mix‑shift / growth accounting to decompose metric changes into per‑dimension contributions.
 
-**`customer_flow_analysis`**  
+**`customer_flow_analysis`**
 Identifies new, returning, and churned customers between two periods.
 
 These tools provide **ground‑truth numerical evidence** for the agent’s reasoning.
 
 ✅ Some UC Functions are registered via **Managed Compute Plane (MCP)** to enable:
-- Versioning  
-- Reuse across agents  
-- Governance and access control  
+- Versioning
+- Reuse across agents
+- Governance and access control
 
 ---
 
 ### 4. Retrieval‑Augmented Generation (RAG)
 
 The project includes a **Vector Search database** containing processed documents such as:
-- Historical RCA reports  
-- Known anomaly explanations  
-- Business context notes (campaigns, logistics incidents, holidays)  
-- Prior patterns and scenarios  
+- Historical RCA reports
+- Known anomaly explanations
+- Business context notes (campaigns, logistics incidents, holidays)
+- Prior patterns and scenarios
 
 #### Role of RAG
 
 RAG is used **only after hypotheses are formed**, to:
-- Provide historical or contextual evidence  
-- Support or challenge hypotheses  
-- Enrich the final explanation  
+- Provide historical or contextual evidence
+- Support or challenge hypotheses
+- Enrich the final explanation
 
 RAG is implemented as a **standard agent tool (non‑MCP)** because:
-- Retrieval is agent‑specific and session‑scoped  
-- It does not represent reusable business logic  
-- Latency and flexibility are prioritized  
+- Retrieval is agent‑specific and session‑scoped
+- It does not represent reusable business logic
+- Latency and flexibility are prioritized
 
 ---
 
 ### 5. Hypothesis Validation and Confidence Scoring
 
 For each hypothesis, the agent:
-- Calls deterministic tools to validate impact  
-- Evaluates consistency across dimensions  
-- Assigns a confidence score based on evidence strength  
+- Calls deterministic tools to validate impact
+- Evaluates consistency across dimensions
+- Assigns a confidence score based on evidence strength
 
 ---
 
 ### 6. Narrator
 
 The Narrator produces an **executive‑friendly RCA report**, including:
-- Summary of the anomaly  
-- Key drivers and quantitative contributions  
-- Contextual evidence from retrieved documents  
-- Confidence‑scored hypotheses  
-- Suggested follow‑up questions  
+- Summary of the anomaly
+- Key drivers and quantitative contributions
+- Contextual evidence from retrieved documents
+- Confidence‑scored hypotheses
+- Suggested follow‑up questions
 
 ---
 
@@ -159,11 +159,11 @@ The Narrator produces an **executive‑friendly RCA report**, including:
 
 This project explicitly follows modern **LLMOps best practices**:
 
-- ✅ **Reproducibility** — deterministic computations via UC Functions  
-- ✅ **Traceability** — tool calls and outputs logged with MLflow Tracing  
-- ✅ **Separation of concerns** — math and data logic outside the LLM  
-- ✅ **Evaluation readiness** — attribution results compared to scenario ground truth  
-- ✅ **Governance** — selective use of MCP for stable business logic  
+- ✅ **Reproducibility** — deterministic computations via UC Functions
+- ✅ **Traceability** — tool calls and outputs logged with MLflow Tracing
+- ✅ **Separation of concerns** — math and data logic outside the LLM
+- ✅ **Evaluation readiness** — attribution results compared to scenario ground truth
+- ✅ **Governance** — selective use of MCP for stable business logic
 
 ---
 
