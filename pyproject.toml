@@ -6,20 +6,21 @@ requires-python = ">=3.12, <3.13"
 dependencies = [
     "cffi==1.17.1",
     "cloudpickle==3.1.1",
-    "numpy==2.4.0",
-    "pandas==2.3.0",
-    "pyarrow==22.0.0",
+    "numpy==2.2.1",
+    "pandas==2.2.3",
+    "pyarrow==18.1.0",
     "databricks-sdk==0.85.0",
     "pydantic==2.11.7",
     "loguru==0.7.3",
     "python-dotenv==1.1.1",
     "databricks-vectorsearch==0.63",
-    "openai==2.8.0",
+    "openai==1.99.5",
     "databricks-mcp==0.4.0",
     "backoff==2.2.1",
     "mlflow==3.10.1",
     "nest-asyncio==1.6.0",
     "arxiv==2.3.1",
+    "feedparser==6.0.11",
     "databricks-agents==1.8.2",
     "psycopg==3.3.2",
     "psycopg-pool==3.3.0",
@@ -85,6 +86,10 @@ ignore = [
     "ANN102",
     "ANN101"
 ]
+
+[tool.ruff.lint.per-file-ignores]
+# Databricks notebooks: long markdown/pip lines; imports after # COMMAND ----------
+"notebooks/**/*.py" = ["E501", "E402"]
 
 [tool.ruff.format]
 indent-style = "space"

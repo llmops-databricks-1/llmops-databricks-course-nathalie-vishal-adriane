@@ -16,7 +16,7 @@
 from loguru import logger
 from pyspark.sql import SparkSession
 
-from ordr_bhvr_rca_agent.config import load_config, get_env
+from ordr_bhvr_rca_agent.config import get_env, load_config
 from ordr_bhvr_rca_agent.data_processor import DataProcessor
 from ordr_bhvr_rca_agent.vector_search import VectorSearchManager
 

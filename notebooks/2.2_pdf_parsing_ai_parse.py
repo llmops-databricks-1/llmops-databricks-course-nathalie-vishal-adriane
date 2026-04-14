@@ -18,10 +18,10 @@
 
 # COMMAND ----------
 
-from loguru import logger
 from databricks.connect import DatabricksSession
+from loguru import logger
 
-from ordr_bhvr_rca_agent.config import load_config, get_env
+from ordr_bhvr_rca_agent.config import get_env, load_config
 from ordr_bhvr_rca_agent.data_processor import DataProcessor
 
 # COMMAND ----------
