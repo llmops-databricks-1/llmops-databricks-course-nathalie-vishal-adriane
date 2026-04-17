@@ -1,10 +1,14 @@
 """News scraping tool for RCA agent to find external context."""
 
 import json
+import socket
 import urllib.parse
 
 import feedparser
 from loguru import logger
+
+# Hard cap on how long a single Google News RSS fetch may block.
+_NEWS_FETCH_TIMEOUT_SECONDS = 5
 
 # News categories and keywords for RCA
 RCA_KEYWORDS = {
@@ -75,7 +79,12 @@ def scrape_news(
             )
 
             try:
-                feed = feedparser.parse(rss_url)
+                old_timeout = socket.getdefaulttimeout()
+                socket.setdefaulttimeout(_NEWS_FETCH_TIMEOUT_SECONDS)
+                try:
+                    feed = feedparser.parse(rss_url)
+                finally:
+                    socket.setdefaulttimeout(old_timeout)
                 cat_results.extend(
                     [
                         {

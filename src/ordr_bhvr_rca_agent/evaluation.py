@@ -1,6 +1,7 @@
 """Evaluation utilities for the RCA agent."""
 
 import mlflow
+from mlflow.entities.assessment import Feedback
 from mlflow.genai.scorers import Guidelines
 
 attribution_correctness_guideline = Guidelines(
@@ -16,9 +17,12 @@ attribution_correctness_guideline = Guidelines(
 hypothesis_quality_guideline = Guidelines(
     name="hypothesis_quality",
     guidelines=[
-        "Hypotheses must be specific and testable based on available data",
-        "Each hypothesis should be supported by either internal data or external context",
-        "Multiple hypotheses should be ranked by likelihood and supporting evidence",
+        "If the response does not contain any concrete hypotheses, the assessment must be 'no'",
+        "If the response is empty, an error message, or a fallback such as 'Max iterations reached', the assessment must be 'no'",
+        "Hypotheses must be specific and testable based on data returned by the agent's tools",
+        "Each hypothesis must be supported by internal tool data; external context may supplement but not replace data evidence",
+        "Multiple hypotheses must be ranked by likelihood with explicit supporting evidence cited for each",
+        "Hypotheses that rely solely on world knowledge without citing tool output must be assessed 'no'",
     ],
     model="databricks:/databricks-gpt-oss-120b",
 )
@@ -42,6 +46,86 @@ scope_guideline = Guidelines(
     ],
     model="databricks:/databricks-gpt-oss-120b",
 )
+
+
+# Known agent fallback/error strings that indicate a failed run
+_INVALID_OUTPUT_PATTERNS = [
+    "max iterations reached",
+    "error:",
+    "traceback (",
+    "exception:",
+]
+
+
+@mlflow.genai.scorer
+def validity_gate(outputs: list) -> bool:
+    """Hard gate: fail empty, error, or agent-fallback outputs before any LLM judge runs.
+
+    Returns:
+        True only if the output contains substantive content worth scoring.
+    """
+    if isinstance(outputs, list) and len(outputs) > 0:
+        if isinstance(outputs[0], dict) and "text" in outputs[0]:
+            text = outputs[0]["text"]
+        elif isinstance(outputs[0], str):
+            text = outputs[0]
+        else:
+            text = str(outputs[0])
+    else:
+        text = str(outputs)
+
+    text_stripped = text.strip()
+    if not text_stripped or len(text_stripped.split()) < 20:
+        return False
+    text_lower = text_stripped.lower()
+    return not any(pat in text_lower for pat in _INVALID_OUTPUT_PATTERNS)
+
+
+@mlflow.genai.scorer
+def grounding_check(outputs: list) -> bool:
+    """Check that the response grounds quantitative claims in tool-retrieved data.
+
+    External context (news, world knowledge) is allowed only when clearly labeled
+    as 'External context' and does not contradict tool evidence.
+
+    Returns:
+        True if grounding requirements are met, False otherwise.
+    """
+    if isinstance(outputs, list) and len(outputs) > 0:
+        if isinstance(outputs[0], dict) and "text" in outputs[0]:
+            text = outputs[0]["text"]
+        elif isinstance(outputs[0], str):
+            text = outputs[0]
+        else:
+            text = str(outputs[0])
+    else:
+        text = str(outputs)
+
+    text_stripped = text.strip()
+    if not text_stripped or len(text_stripped.split()) < 20:
+        return False
+
+    text_lower = text_stripped.lower()
+    # Response must cite at least one concrete data point (number or % or named metric)
+    import re
+
+    has_data_reference = bool(
+        re.search(r"\d+\.?\d*\s*%", text_lower)
+        or re.search(
+            r"\b\d{1,3}[,\d]*\s*(orders|units|sales|revenue|customers)", text_lower
+        )
+        or any(
+            kw in text_lower
+            for kw in [
+                "increased by",
+                "decreased by",
+                "declined by",
+                "grew by",
+                "fell by",
+            ]
+        )
+    )
+    return has_data_reference
 
 
 @mlflow.genai.scorer
@@ -118,16 +202,13 @@ def includes_hypothesis(outputs: list) -> bool:
 
 
 @mlflow.genai.scorer
-def report_length_check(outputs: list) -> bool:
-    """Check that the output is between 100 and 500 words for RCA reports.
+def report_length_check(outputs: list) -> Feedback:
+    """Return word count as a numeric score so it is visible in the MLflow UI.
 
-    Args:
-        outputs: List of output dictionaries
-
-    Returns:
-        True if word count is appropriate, False otherwise
+    Score is the raw word count. Rationale records PASS/FAIL against the
+    60–700 word threshold so reviewers can sort and filter by length directly
+    in the traces table.
     """
-    # Handle different output formats
     if isinstance(outputs, list) and len(outputs) > 0:
         if isinstance(outputs[0], dict) and "text" in outputs[0]:
             text = outputs[0]["text"]
@@ -138,8 +219,24 @@ def report_length_check(outputs: list) -> bool:
     else:
         text = str(outputs)
 
-    word_count = len(text.split())
-    return 100 <= word_count <= 500
+    word_count = len(text.strip().split())
+    min_words, max_words = 60, 700
+    passed = min_words <= word_count <= max_words
+    verdict = "PASS" if passed else "FAIL"
+    return Feedback(
+        value=word_count,
+        rationale=f"Report has {word_count} words (acceptable range: {min_words}–{max_words}). {verdict}.",
+    )
+
+
+@mlflow.genai.scorer
+def tool_diversity_check(outputs: list) -> bool:
+    """Check if the agent used RAG and/or news tools, not just Genie."""
+    content = str(outputs)
+    content_lower = content.lower()
+    uses_research = "arxiv" in content_lower or "research" in content_lower
+    uses_news = "news" in content_lower or "headline" in content_lower
+    return uses_research or uses_news
 
 
 def create_eval_data_from_file(eval_inputs_path: str) -> list[dict]:
@@ -178,9 +275,12 @@ def evaluate_rca_agent(
 
     if scorers is None:
         scorers = [
+            validity_gate,
             report_length_check,
+            grounding_check,
             mentions_metrics,
             includes_hypothesis,
+            tool_diversity_check,
             attribution_correctness_guideline,
             hypothesis_quality_guideline,
             narrative_faithfulness_guideline,

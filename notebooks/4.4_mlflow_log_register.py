@@ -1,6 +1,9 @@
 # Databricks notebook source
-# MAGIC %pip install /Workspace/Users/aschelin@gmail.com/.bundle/llmops-databricks-course-nathalie-vishal-adriane/dev/files/ nest-asyncio
-# MAGIC dbutils.library.restartPython()
+# COMMAND ----------
+%pip install /Workspace/Users/nathalie-frisch@gmx.de/.bundle/llmops-databricks-course-nathalie-vishal-adriane/dev/artifacts/.internal/llmops_databricks_course_nathalie_vishal_adriane-0.0.1-py3-none-any.whl --force-reinstall --quiet
+
+# COMMAND ----------
+dbutils.library.restartPython()
 
 # COMMAND ----------
 
@@ -19,17 +22,24 @@ from mlflow.models.resources import (
     DatabricksServingEndpoint,
     DatabricksSQLWarehouse,
     DatabricksTable,
+    DatabricksVectorSearchIndex,
 )
 
 from ordr_bhvr_rca_agent.agent import SimpleAgent
 from ordr_bhvr_rca_agent.config import ProjectConfig
 from ordr_bhvr_rca_agent.evaluation import (
     attribution_correctness_guideline,
+    grounding_check,
     hypothesis_quality_guideline,
+    includes_hypothesis,
     report_length_check,
+    tool_diversity_check,
+    validity_gate,
 )
 from ordr_bhvr_rca_agent.mcp import ToolInfo, create_mcp_tools
 from ordr_bhvr_rca_agent.news_scraper import SCRAPE_NEWS_TOOL_SPEC, scrape_news
+from ordr_bhvr_rca_agent.rag import ARXIV_TOOL_SPEC, make_arxiv_search_fn
+from ordr_bhvr_rca_agent.vector_search import VectorSearchManager
 
 # COMMAND ----------
 # Initialize the RCA agent
@@ -59,9 +69,33 @@ news_tool = ToolInfo(
 logger.info("News scraping tool created")
 
 # COMMAND ----------
-# Create enhanced agent with MCP tools + news scraping
+# Create RAG tool backed by the arXiv paper index under mlops_dev.vishalkr
+# The data pipeline (notebooks/2.x series) built this index under a different schema,
+# so we point VectorSearchManager at it explicitly via index_name.
 
-all_tools = mcp_tools + [news_tool]
+RAG_INDEX_NAME = "mlops_dev.vishalkr.arxiv_index"
+
+vs_manager = VectorSearchManager(
+    config=cfg,
+    index_name=RAG_INDEX_NAME,
+)
+
+search_arxiv_papers = make_arxiv_search_fn(vs_manager)
+
+RAG_TOOL_SPEC = ARXIV_TOOL_SPEC
+
+rag_tool = ToolInfo(
+    name="search_arxiv_papers",
+    spec=RAG_TOOL_SPEC,
+    exec_fn=search_arxiv_papers,
+)
+
+logger.info(f"RAG tool created — index: {RAG_INDEX_NAME}")
+
+# COMMAND ----------
+# Create enhanced agent with MCP tools + news scraping + RAG
+
+all_tools = mcp_tools + [news_tool, rag_tool]
 
 rca_agent_with_news = SimpleAgent(
     llm_endpoint=cfg.llm_endpoint,
@@ -70,7 +104,7 @@ rca_agent_with_news = SimpleAgent(
 )
 
 logger.info(
-    f"Created RCA agent with {len(mcp_tools)} MCP tools + 1 news scraping tool = {len(all_tools)} total tools"
+    f"Created RCA agent with {len(mcp_tools)} MCP tools + 1 news scraping tool + 1 RAG tool = {len(all_tools)} total tools"
 )
 
 # COMMAND ----------
@@ -78,10 +112,16 @@ logger.info(
 with open("../rca_eval_inputs.txt") as f:
     eval_data = [{"inputs": {"question": line.strip()}} for line in f if line.strip()]
 
+import mlflow.openai
 
+# Re-enable autologging — calls inside @mlflow.trace become child spans
+mlflow.openai.autolog()
+
+
+@mlflow.trace
 def predict_fn_with_news(question: str) -> str:
     """Predict function using RCA agent with news scraping capability."""
-    result = rca_agent_with_news.chat(question)
+    result = rca_agent_with_news.chat(question, max_iterations=12)
     return result
 
 
@@ -91,7 +131,11 @@ results = mlflow.genai.evaluate(
     predict_fn=predict_fn_with_news,
     data=eval_data,
     scorers=[
+        validity_gate,
         report_length_check,
+        grounding_check,
+        includes_hypothesis,
+        tool_diversity_check,
         attribution_correctness_guideline,
         hypothesis_quality_guideline,
     ],
@@ -105,7 +149,8 @@ resources = [
     DatabricksGenieSpace(genie_space_id=cfg.genie_space_id),
     DatabricksTable(table_name=f"{cfg.catalog}.{cfg.schema}.{cfg.table_name}"),
     DatabricksSQLWarehouse(warehouse_id=cfg.warehouse_id),
-    DatabricksServingEndpoint(endpoint_name="databricks-bge-large-en"),
+    DatabricksServingEndpoint(endpoint_name=cfg.embedding_endpoint),
+    DatabricksVectorSearchIndex(index_name=RAG_INDEX_NAME),
 ]
 
 # COMMAND ----------

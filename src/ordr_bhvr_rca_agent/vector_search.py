@@ -16,6 +16,7 @@ class VectorSearchManager:
         endpoint_name: str | None = None,
         embedding_model: str | None = None,
         usage_policy_id: str | None = None,
+        index_name: str | None = None,
     ) -> None:
         """Initialize VectorSearchManager.
 
@@ -24,6 +25,8 @@ class VectorSearchManager:
             endpoint_name: Name of the vector search endpoint (uses config if None)
             embedding_model: Name of the embedding model endpoint (uses config if None)
             usage_policy_id: ID of the usage policy for the endpoint (optional)
+            index_name: Fully qualified index name (e.g. catalog.schema.arxiv_index).
+                Defaults to {config.catalog}.{config.schema}.arxiv_index
         """
         self.config = config
         self.endpoint_name = endpoint_name or config.vector_search_endpoint
@@ -38,7 +41,7 @@ class VectorSearchManager:
             workspace_url=w.config.host,
             personal_access_token=w.tokens.create(lifetime_seconds=1200).token_value,
         )
-        self.index_name = f"{self.catalog}.{self.schema}.arxiv_index"
+        self.index_name = index_name or f"{self.catalog}.{self.schema}.arxiv_index"
 
     def create_endpoint_if_not_exists(self) -> None:
         """Create vector search endpoint if it doesn't exist."""
