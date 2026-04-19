@@ -1,7 +1,6 @@
 """Simple agent implementation for tool-calling workflows."""
 
 import json
-from typing import Any
 
 from databricks.sdk import WorkspaceClient
 from loguru import logger
@@ -20,7 +19,8 @@ class SimpleAgent:
     Attributes:
         llm_endpoint: Name of the LLM serving endpoint
         system_prompt: System prompt that defines the agent's behavior
-        workspace_client: Databricks workspace client (optional, auto-created if not provided)
+        workspace_client: Databricks workspace client (optional,
+            auto-created if not provided)
     """
 
     def __init__(
@@ -59,7 +59,7 @@ class SimpleAgent:
         """
         return [tool.spec for tool in self._tools_dict.values()]
 
-    def execute_tool(self, tool_name: str, args: dict) -> Any:
+    def execute_tool(self, tool_name: str, args: dict) -> str | dict | list:  # noqa: ANN401
         """Execute a tool by name.
 
         Args:
@@ -91,7 +91,7 @@ class SimpleAgent:
             {"role": "user", "content": user_message},
         ]
 
-        for iteration in range(max_iterations):
+        for _iteration in range(max_iterations):
             # Call LLM
             response = self._client.chat.completions.create(
                 model=self.llm_endpoint,

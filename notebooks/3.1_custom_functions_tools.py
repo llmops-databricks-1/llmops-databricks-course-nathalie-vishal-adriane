@@ -165,7 +165,7 @@ logger.info(json.dumps(metric_delta_tool_spec, indent=2))
 
 
 # Helper function to parse vector search results
-def parse_vector_search_results(results):
+def parse_vector_search_results(results: dict) -> list[dict]:
     """Parse vector search results from array format to dict format.
 
     Args:
@@ -177,7 +177,7 @@ def parse_vector_search_results(results):
     columns = [col["name"] for col in results.get("manifest", {}).get("columns", [])]
     data_array = results.get("result", {}).get("data_array", [])
 
-    return [dict(zip(columns, row_data)) for row_data in data_array]
+    return [dict(zip(columns, row_data, strict=False)) for row_data in data_array]
 
 
 # COMMAND ----------
@@ -298,8 +298,6 @@ logger.info(f"1. {metric_delta_tool.name}")
 
 # COMMAND ----------
 
-from typing import Any
-
 
 class ToolRegistry:
     """Registry for managing agent tools."""
@@ -322,7 +320,7 @@ class ToolRegistry:
         """Get all tool specifications."""
         return [tool.spec for tool in self._tools.values()]
 
-    def execute(self, name: str, args: dict) -> Any:
+    def execute(self, name: str, args: dict) -> object:  # noqa: ANN401
         """Execute a tool with arguments."""
         tool = self.get_tool(name)
         return tool.exec_fn(**args)
@@ -431,7 +429,7 @@ logger.info(f"metric_delta result: {calc_result}")
 # COMMAND ----------
 
 
-def test_tool(tool_name: str, test_cases: list[dict]):
+def test_tool(tool_name: str, test_cases: list[dict]) -> None:
     """Test a tool with multiple test cases."""
     logger.info(f"Testing tool: {tool_name}")
     logger.info("=" * 80)
@@ -495,7 +493,7 @@ agent = SimpleAgent(
 # tools=registry.get_all_tools())
 
 logger.info("✓ Agent created with tools:")
-for tool_name in agent._tools_dict.keys():
+for tool_name in agent._tools_dict:
     logger.info(f"  - {tool_name}")
 
 # COMMAND ----------
@@ -555,10 +553,10 @@ GENIE_SPACE_ID = cfg.genie_space_id  # Using your existing Genie space
 
 # Databricks auth
 DATABRICKS_HOST = (
-    dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiUrl().get()
+    dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiUrl().get()  # noqa: F821
 )
 DATABRICKS_TOKEN = (
-    dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().get()
+    dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().get()  # noqa: F821
 )
 
 RCA_HEADERS = {
