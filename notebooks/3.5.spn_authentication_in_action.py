@@ -1,0 +1,69 @@
+# Databricks notebook source
+
+# COMMAND ----------
+
+# MAGIC %pip install /Workspace/Users/aschelin@gmail.com/.bundle/llmops-databricks-course-nathalie-vishal-adriane/dev/files
+
+# COMMAND ----------
+
+# MAGIC %restart_python
+
+# COMMAND ----------
+
+import os
+from uuid import uuid4
+
+from databricks.sdk import WorkspaceClient
+from databricks.sdk.service.postgres import PostgresAPI
+from loguru import logger
+
+from ordr_bhvr_rca_agent.config import ProjectConfig
+from ordr_bhvr_rca_agent.memory import LakebaseMemory
+
+cfg = ProjectConfig.from_yaml("../project_config.yml")
+
+w = WorkspaceClient()
+pg_api = PostgresAPI(w.api_client)
+
+project_id = cfg.lakebase_project_id
+
+scope_name = "rca-agent-scope"
+os.environ["DATABRICKS_CLIENT_ID"] = dbutils.secrets.get(scope_name, "client_id")  # noqa: F821
+os.environ["DATABRICKS_CLIENT_SECRET"] = dbutils.secrets.get(scope_name, "client_secret")  # noqa: F821
+os.environ["DATABRICKS_HOST"] = w.config.host
+
+# COMMAND ----------
+# Get project, branch, and endpoint details
+project = pg_api.get_project(name=f"projects/{project_id}")
+default_branch = next(iter(pg_api.list_branches(parent=project.name)))
+endpoint = next(iter(pg_api.list_endpoints(parent=default_branch.name)))
+host = endpoint.status.hosts.host
+
+memory = LakebaseMemory(
+    host=host,
+    instance_name=endpoint.name,
+    pg_api=pg_api,
+)
+
+# COMMAND ----------
+
+# Create a test session
+session_id = f"test-session-{uuid4()}"
+
+# Save some messages
+test_messages = [
+    {"role": "user", "content": "What factors contributed to the sales decline?"},
+    {
+        "role": "assistant",
+        "content": "Based on the analysis, several factors contributed to the decline...",
+    },
+    {"role": "user", "content": "Tell me more about the seasonal trends"},
+]
+
+memory.save_messages(session_id, test_messages)
+logger.info(f"✓ Saved {len(test_messages)} messages to session: {session_id}")
+
+# COMMAND ----------
+
+# Load messages back
+loaded_messages = memory.load_messages(session_id)
