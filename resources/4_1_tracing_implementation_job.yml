@@ -1,0 +1,24 @@
+resources:
+  jobs:
+    notebook_4_1_tracing_implementation:
+      name: 4-1-tracing-implementation
+      tags:
+        project_name: "llmops-databricks-course-nathalie-vishal-adriane"
+        module: "series-4-tracing-evaluation"
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"
+            dependencies:
+              - ../dist/*.whl
+
+      tasks:
+        - task_key: tracing_implementation
+          environment_key: default
+          notebook_task:
+            notebook_path: ../notebooks/4.1_tracing_implementation.py
+            base_parameters:
+              env: ${bundle.target}
+              git_sha: "${var.git_sha}"
+              run_id: "{{job.run_id}}"
