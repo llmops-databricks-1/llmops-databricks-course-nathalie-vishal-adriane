@@ -273,10 +273,10 @@ if len(traces_df) > 0:
             cols_to_show.append(col)
 
     if cols_to_show:
-        display(traces_df[cols_to_show].head())
+        display(traces_df[cols_to_show].head())  # noqa: F821
     else:
         # Just show all columns if none of the expected ones exist
-        display(traces_df.head())
+        display(traces_df.head())  # noqa: F821
 else:
     logger.info("No traces found. Try running some traced functions first!")
 
@@ -434,10 +434,10 @@ if len(recent_traces_df) > 0:
             cols_to_show.append(col)
 
     if cols_to_show:
-        display(recent_traces_df[cols_to_show].head(10))
+        display(recent_traces_df[cols_to_show].head(10))  # noqa: F821
     else:
         # Just show first few columns if none of our preferred ones exist
-        display(recent_traces_df.head(10))
+        display(recent_traces_df.head(10))  # noqa: F821
 else:
     logger.info("No traces found.")
 

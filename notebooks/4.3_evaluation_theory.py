@@ -175,7 +175,7 @@ results = mlflow.genai.evaluate(
 
 logger.info("RCA Evaluation Results:")
 logger.info("=" * 80)
-display(results)
+display(results)  # noqa: F821
 
 # COMMAND ----------
 
@@ -231,7 +231,7 @@ judge_results = mlflow.genai.evaluate(
 
 logger.info("Judge Evaluation Results:")
 logger.info("=" * 80)
-display(judge_results.tables["eval_results"])
+display(judge_results.tables["eval_results"])  # noqa: F821
 
 # COMMAND ----------
 
@@ -328,7 +328,7 @@ custom_results = mlflow.genai.evaluate(
 
 logger.info("Custom Scorer Results:")
 logger.info("=" * 80)
-display(custom_results.tables["eval_results"])
+display(custom_results.tables["eval_results"])  # noqa: F821
 
 # COMMAND ----------
 
@@ -389,7 +389,7 @@ comprehensive_results = mlflow.genai.evaluate(
 
 logger.info("Comprehensive RCA Evaluation Results:")
 logger.info("=" * 80)
-comprehensive_results
+_ = comprehensive_results
 
 # COMMAND ----------
 

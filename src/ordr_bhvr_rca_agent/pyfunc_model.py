@@ -12,7 +12,7 @@ from ordr_bhvr_rca_agent.mcp import create_mcp_tools
 class RCAAgentModel(PythonModel):
     """MLflow PyFunc model wrapper for the RCA agent."""
 
-    def load_context(self, context):
+    def load_context(self, context: object) -> None:
         """Load the model and initialize the agent.
 
         Args:
@@ -40,7 +40,9 @@ class RCAAgentModel(PythonModel):
             tools=mcp_tools,
         )
 
-    def predict(self, context, model_input, params=None):
+    def predict(
+        self, context: object, model_input: object, params: object = None
+    ) -> dict[str, str]:
         """Generate predictions using the RCA agent.
 
         Args:

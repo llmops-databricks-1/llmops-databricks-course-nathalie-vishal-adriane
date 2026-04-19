@@ -1,9 +1,9 @@
 # Databricks notebook source
 # COMMAND ----------
-%pip install /Workspace/Users/nathalie-frisch@gmx.de/.bundle/llmops-databricks-course-nathalie-vishal-adriane/dev/artifacts/.internal/llmops_databricks_course_nathalie_vishal_adriane-0.0.1-py3-none-any.whl --force-reinstall --quiet
+# MAGIC %pip install /Workspace/Users/nathalie-frisch@gmx.de/.bundle/llmops-databricks-course-nathalie-vishal-adriane/dev/artifacts/.internal/llmops_databricks_course_nathalie_vishal_adriane-0.0.1-py3-none-any.whl --force-reinstall --quiet
 
 # COMMAND ----------
-dbutils.library.restartPython()
+dbutils.library.restartPython()  # noqa: F821
 
 # COMMAND ----------
 

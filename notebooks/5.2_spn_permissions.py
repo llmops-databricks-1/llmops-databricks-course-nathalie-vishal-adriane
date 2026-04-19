@@ -27,7 +27,7 @@ w = WorkspaceClient()
 
 # COMMAND ----------
 # Get service principal from secrets
-spn_app_id = dbutils.secrets.get("dev_SPN", "client_id")
+spn_app_id = dbutils.secrets.get("dev_SPN", "client_id")  # noqa: F821
 
 # COMMAND ----------
 

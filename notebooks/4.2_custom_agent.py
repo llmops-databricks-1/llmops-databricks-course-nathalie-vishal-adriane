@@ -252,7 +252,7 @@ if len(recent_traces_df) > 0:
             simple_cols.append(col)
 
     if simple_cols:
-        display(recent_traces_df[simple_cols].head())
+        display(recent_traces_df[simple_cols].head())  # noqa: F821
     else:
         logger.info(str(recent_traces_df.info()))
 else:
@@ -301,7 +301,7 @@ if len(recent_traces_df) > 0:
             simple_cols.append(col)
 
     if simple_cols:
-        display(recent_traces_df[simple_cols].head())
+        display(recent_traces_df[simple_cols].head())  # noqa: F821
     else:
         # Fallback: just show the info
         logger.info(str(recent_traces_df.info()))

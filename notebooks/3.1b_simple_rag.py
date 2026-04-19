@@ -354,7 +354,7 @@ If the context doesn't contain relevant information, say so. Always cite paper t
 
         return answer
 
-    def clear_history(self):
+    def clear_history(self) -> None:
         """Clear conversation history."""
         self.conversation_history = []
 

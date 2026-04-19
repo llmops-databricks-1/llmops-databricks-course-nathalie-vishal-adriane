@@ -385,7 +385,7 @@ agent = SimpleAgent(
 )
 
 logger.info("✓ Agent created with MCP tools:")
-for tool_name in agent._tools_dict.keys():
+for tool_name in agent._tools_dict:
     logger.info(f"  - {tool_name}")
 
 # COMMAND ----------

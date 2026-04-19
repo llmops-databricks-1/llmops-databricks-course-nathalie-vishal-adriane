@@ -7,9 +7,15 @@ from mlflow.genai.scorers import Guidelines
 attribution_correctness_guideline = Guidelines(
     name="attribution_correctness",
     guidelines=[
-        "The analysis must correctly identify the primary drivers of the anomaly based on the data",
+        (
+            "The analysis must correctly identify the primary drivers of the "
+            "anomaly based on the data"
+        ),
         "Attribution percentages should align with the waterfall decomposition results",
-        "The response must not make up attribution factors that aren't supported by the data",
+        (
+            "The response must not make up attribution factors that aren't "
+            "supported by the data"
+        ),
     ],
     model="databricks:/databricks-gpt-oss-120b",
 )
@@ -17,12 +23,30 @@ attribution_correctness_guideline = Guidelines(
 hypothesis_quality_guideline = Guidelines(
     name="hypothesis_quality",
     guidelines=[
-        "If the response does not contain any concrete hypotheses, the assessment must be 'no'",
-        "If the response is empty, an error message, or a fallback such as 'Max iterations reached', the assessment must be 'no'",
-        "Hypotheses must be specific and testable based on data returned by the agent's tools",
-        "Each hypothesis must be supported by internal tool data; external context may supplement but not replace data evidence",
-        "Multiple hypotheses must be ranked by likelihood with explicit supporting evidence cited for each",
-        "Hypotheses that rely solely on world knowledge without citing tool output must be assessed 'no'",
+        (
+            "If the response does not contain any concrete hypotheses, the "
+            "assessment must be 'no'"
+        ),
+        (
+            "If the response is empty, an error message, or a fallback such as "
+            "'Max iterations reached', the assessment must be 'no'"
+        ),
+        (
+            "Hypotheses must be specific and testable based on data returned by "
+            "the agent's tools"
+        ),
+        (
+            "Each hypothesis must be supported by internal tool data; external "
+            "context may supplement but not replace data evidence"
+        ),
+        (
+            "Multiple hypotheses must be ranked by likelihood with explicit "
+            "supporting evidence cited for each"
+        ),
+        (
+            "Hypotheses that rely solely on world knowledge without citing tool "
+            "output must be assessed 'no'"
+        ),
     ],
     model="databricks:/databricks-gpt-oss-120b",
 )
@@ -30,7 +54,10 @@ hypothesis_quality_guideline = Guidelines(
 narrative_faithfulness_guideline = Guidelines(
     name="narrative_faithfulness",
     guidelines=[
-        "The narrative must accurately reflect the quantitative findings from the analysis",
+        (
+            "The narrative must accurately reflect the quantitative findings "
+            "from the analysis"
+        ),
         "Claims in the narrative must be supported by the data or cited external sources",
         "The response must not exaggerate or minimize the significance of findings",
     ],
@@ -40,7 +67,10 @@ narrative_faithfulness_guideline = Guidelines(
 scope_guideline = Guidelines(
     name="stays_in_scope",
     guidelines=[
-        "The response must focus on order behavior analysis and root cause identification",
+        (
+            "The response must focus on order behavior analysis and root cause "
+            "identification"
+        ),
         "The response should not stray into unrelated business topics",
         "If asked about non-RCA topics, politely redirect to the anomaly investigation",
     ],
@@ -225,7 +255,10 @@ def report_length_check(outputs: list) -> Feedback:
     verdict = "PASS" if passed else "FAIL"
     return Feedback(
         value=word_count,
-        rationale=f"Report has {word_count} words (acceptable range: {min_words}–{max_words}). {verdict}.",
+        rationale=(
+            f"Report has {word_count} words (acceptable range: "
+            f"{min_words}–{max_words}). {verdict}."
+        ),
     )
 
 
@@ -254,7 +287,7 @@ def create_eval_data_from_file(eval_inputs_path: str) -> list[dict]:
 
 
 def evaluate_rca_agent(
-    agent, eval_inputs_path: str, scorers: list | None = None
+    agent: object, eval_inputs_path: str, scorers: list | None = None
 ) -> mlflow.models.EvaluationResult:
     """Run evaluation on the RCA agent.
 

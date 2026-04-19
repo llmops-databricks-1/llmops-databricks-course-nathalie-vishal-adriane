@@ -35,10 +35,10 @@ LLM_ENDPOINT = "databricks-claude-sonnet-4-5"  # Change to any Foundation Model 
 
 # Databricks auth (auto-configured in notebooks)
 DATABRICKS_HOST = (
-    dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiUrl().get()
+    dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiUrl().get()  # noqa: F821
 )
 DATABRICKS_TOKEN = (
-    dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().get()
+    dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().get()  # noqa: F821
 )
 
 HEADERS = {
@@ -454,7 +454,7 @@ report = run_rca_agent(user_question)
 import re as _re
 
 
-def _md_to_html(text):
+def _md_to_html(text: str) -> str:
     """Lightweight markdown to HTML for report rendering."""
     h = text
     h = _re.sub(r"^##### (.+)$", r"<h5>\1</h5>", h, flags=_re.MULTILINE)
@@ -474,7 +474,8 @@ def _md_to_html(text):
 
 
 report_html = _md_to_html(report)
-displayHTML(f"""
+displayHTML(  # noqa: F821
+    f"""
 <div style="max-width:900px; font-family:sans-serif; line-height:1.6; padding:20px;">
   <style>
     h1 {{ color:#1B3A5C; border-bottom:2px solid #1B3A5C; padding-bottom:8px; }}
@@ -487,7 +488,8 @@ displayHTML(f"""
   </style>
   {report_html}
 </div>
-""")
+"""
+)
 
 # COMMAND ----------
 
@@ -498,6 +500,6 @@ print(report)
 
 # COMMAND ----------
 
-genie_questions
+_ = genie_questions  # noqa: F821
 
 # COMMAND ----------

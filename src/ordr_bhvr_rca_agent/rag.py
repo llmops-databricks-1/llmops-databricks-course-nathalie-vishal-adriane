@@ -1,13 +1,16 @@
 """RAG tool for RCA agent — arXiv paper vector search."""
 
 import json
+from collections.abc import Callable
 
 from loguru import logger
 
 from ordr_bhvr_rca_agent.vector_search import VectorSearchManager
 
 
-def make_arxiv_search_fn(vs_manager: VectorSearchManager):
+def make_arxiv_search_fn(
+    vs_manager: VectorSearchManager,
+) -> Callable[[str, int], str]:
     """Return an exec_fn bound to *vs_manager* whose signature matches ARXIV_TOOL_SPEC.
 
     Args:
@@ -20,7 +23,7 @@ def make_arxiv_search_fn(vs_manager: VectorSearchManager):
     def search_arxiv_papers(query: str, num_results: int = 3) -> str:
         """Search the arXiv paper vector index for context relevant to the query."""
         results = vs_manager.search(query=query, num_results=num_results)
-        # Databricks VS returns {"result": {"data_array": [[id, text, metadata], ...], "manifest": {...}}}
+        # Databricks VS returns a manifest plus data rows under result.data_array.
         rows = (
             results.get("result", {}).get("data_array", [])
             if isinstance(results, dict)
@@ -45,16 +48,21 @@ ARXIV_TOOL_SPEC = {
     "function": {
         "name": "search_arxiv_papers",
         "description": (
-            "Search a vector index of arXiv AI/ML research papers for background context "
+            "Search a vector index of arXiv AI/ML research papers for "
+            "background context "
             "on methods, techniques, or anomaly patterns relevant to the analysis. "
-            "Use this after forming hypotheses to find supporting or contradicting evidence."
+            "Use this after forming hypotheses to find supporting or "
+            "contradicting evidence."
         ),
         "parameters": {
             "type": "object",
             "properties": {
                 "query": {
                     "type": "string",
-                    "description": "Semantic search query (e.g. 'demand forecasting anomaly detection e-commerce')",
+                    "description": (
+                        "Semantic search query (e.g. 'demand forecasting "
+                        "anomaly detection e-commerce')"
+                    ),
                 },
                 "num_results": {
                     "type": "integer",
